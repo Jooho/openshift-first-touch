@@ -1,0 +1,32 @@
+
+- name: Common preresuities
+  import_tasks: common.yml
+  delegate_to: localhost
+  run_once: yes
+  become: true
+  become_user: root
+  
+- name: Reinstall atomic-openshift-utils
+  yum:
+    name: atomic-openshift-utils
+    state: "{{ item }}"
+  with_items:
+  - absent
+  - latest
+  delegate_to: localhost
+  run_once: yes
+  become: true
+  become_user: root
+  
+    
+- name: Reinstall atomic-openshift-clients
+  yum:
+    name: atomic-openshift-clients
+    state: "{{ item }}"
+  with_items:
+  - absent
+  - latest
+  delegate_to: localhost
+  run_once: yes
+  become: true
+  become_user: root

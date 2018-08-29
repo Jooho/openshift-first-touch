@@ -1,0 +1,92 @@
+
+- name: Initialization Checkpoint Start
+  hosts: all
+  gather_facts: false
+  roles:
+  - checkpoint
+- hosts: all
+  tasks:
+   - name: Block of upgrade prepare
+     block:
+       - name: Set Upgrade Prepare 'In Progress'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_prepare:
+               title: "Upgrade - Prepare"
+               status: "In Progress"
+               start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+    
+       - name: Set Upgrade Prepare 'Complete'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_prepare:
+               status: "Complete"
+               end: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+     tags:
+       - prepare
+  
+   - name: Block of upgrade control plane
+     block:
+       - name: Set Control Plane 'In Progress'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_control_plane:
+               title: "Upgrade - Control Plane"
+               status: "In Progress"
+               start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+    
+          
+       - name: Set Upgrade Control Plane 'Complete'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_control_plane:
+               status: "Complete"
+               end: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+     tags:
+       - control_plane
+
+   - name: Block of upgrade infra nodes
+     block:
+       - name: Set Infra Nodes 'In Progress'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_infra_node:
+               title: "Upgrade - Infra Nodes"
+               status: "In Progress"
+               start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+     
+          
+       - name: Set Upgrade Infra Nodes 'Complete'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_infra_node:
+               status: "Complete"
+     tags:
+       - infra
+   
+   - name: Block of upgrade app nodes
+     block:
+       - name: Set App Nodes 'In Progress'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_app_node:
+               title: "Upgrade - App Nodes"
+               status: "In Progress"
+               start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+      
+          
+       - name: Set Upgrade App Nodes 'Complete'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_app_node:
+               status: "Complete"
+     tags:
+      - app 

@@ -1,0 +1,7 @@
+- hosts: localhost
+  tasks:
+  - name: set var
+    set_fact:
+      openshift_test: a
+- name: test
+  import_playbook: b.yml

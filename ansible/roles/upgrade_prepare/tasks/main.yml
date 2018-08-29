@@ -1,0 +1,14 @@
+---
+
+- name: Set up ansible controller
+  import_tasks: ./ansible-controller.yml
+  when: node_type == 'ansible-controller'
+
+- name: Set up ocp host
+  import_tasks: ./ocp-host.yml
+  when: node_type == 'ocp-host'
+
+- name: Set up ocp lb host
+  import_tasks: ./ocp-lb.yml
+  when: node_type == 'ocp-lb'
+
