@@ -1,7 +1,7 @@
-- name: Refresh subscription
-  shell: "subscription-manager refresh"
-  become: true
-  become_user: root
+#- name: Refresh subscription
+#  shell: "subscription-manager refresh"
+#  become: true
+#  become_user: root
 
 # Too slow
 #- name: Enable/Disable repositories for minor upgrade
@@ -19,18 +19,25 @@
 #  become: true
 #  become_user: root
 
-- name: Change repos
-  set_fact:
-    disable_repos: "--disable=rhel-7-server-ose-3.7-rpms"
-    enable_repos: "--enable=rhel-7-server-ose-3.9-rpms --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-ansible-2.4-rpms --enable=rhel-7-fast-datapath-rpms"
-  when: "ocp_version == 3.9"
+#- name: Change repos
+#  set_fact:
+#    disable_repos: "--disable=rhel-7-server-ose-3.7-rpms"
+#    enable_repos: "--enable=rhel-7-server-ose-3.9-rpms --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-ansible-2.4-rpms --enable=rhel-7-fast-datapath-rpms"
+#  when: "ocp_version == 3.9"
 
-- name: Enable/Disable repositories 
-  shell: "{{ item }}"
-  with_items:
-  - "subscription-manager repos {{ disable_repos }} {{ enable_repos }}"
-  - "yum clean all"
-  - "yum repolist"
+#- name: Enable/Disable repositories 
+#  shell: "{{ item }}"
+#  with_items:
+#  - "subscription-manager repos {{ disable_repos }} {{ enable_repos }}"
+#  - "yum clean all"
+#  - "yum repolist"
+#  become: true
+#  become_user: root
+
+- name: Upgrade atomic-openshift-utils
+  yum:
+    name: atomic-openshift-utils
+    state: latest
   become: true
   become_user: root
 
