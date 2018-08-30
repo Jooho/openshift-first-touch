@@ -10,26 +10,6 @@
 
 - hosts: localhost
   tasks:
-    - name: Set directory based on ocp version (default - 3.7)
-      set_fact:
-        control_plane_upgrade_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/upgrades/v3_7/upgrade_control_plane.yml
-        node_upgrade_yaml:  /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/upgrades/v3_7/upgrade_nodes.yml
-        efk_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
-        metrics_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml 
-      tags:
-      - always 
-    - name: Set directory based on ocp version (3.9)
-      set_fact:
-        control_plane_upgrade_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/upgrades/v3_9/upgrade_control_plane.yml
-        node_upgrade_yaml:  /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/upgrades/v3_9/upgrade_nodes.yml
-        efk_yaml: /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml 
-        metrics_yaml: /usr/share/ansible/openshift-ansible/playbooks/openshift-metrics/config.yml 
-      when: "ocp_version == 3.9"
-      tags:
-      - always 
-
-- hosts: localhost
-  tasks:
     - debug: var=control_plane_upgrade_yaml
       tags:
       - always
@@ -119,59 +99,14 @@
       tags:
         - app 
 
-- hosts: localhost
-  tasks:
-    - name: Set EFK Logging Stack 'In Progress'
-      run_once: true
-      set_stats:
-        data:
-          upgrade_phase_efk:
-            title: "Upgrade - EFK Logging Stack"
-            status: "In Progress"
-            start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
-      tags:
-        - efk 
    
 - name: Upgrade EFK Logging stack
   import_playbook: "{{efk_yaml}} openshift_logging_install_logging=false openshift_logging_image_version={{efk_image_version}}"
   tags: [efk]
           
-- hosts: localhost
-  tasks:
-    - name: Set Upgrade EFK Logging Stack 'Complete'
-      run_once: true
-      set_stats:
-        data:
-          upgrade_phase_efk:
-            status: "Complete"
-      tags:
-        - efk
 
-- hosts: localhost
-  tasks:
-    - name: Set Metrics 'In Progress'
-      run_once: true
-      set_stats:
-        data:
-          upgrade_phase_metrics:
-            title: "Upgrade - Metrics"
-            status: "In Progress"
-            start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
-      tags:
-        - metrics
-   
 - name: Upgrade Metrics
   include: "{{metrics_yaml}} openshift_metrics_install_metrics=true openshift_metrics_image_version={{metrics_image_version}} openshift_metrics_cassandra_storage_type={{metrics_cassandra_storage_type}}"
   tags:
     - metrics
           
-- hosts: localhost
-  tasks:
-    - name: Set Upgrade Metrics 'Complete'
-      run_once: true
-      set_stats:
-        data:
-          upgrade_phase_metrics:
-            status: "Complete"
-      tags:
-        - metrics

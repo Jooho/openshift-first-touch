@@ -1,1 +1,22 @@
-ocp_version: 3.9
+
+# Metrics
+#openshift_metrics_image_version=<tag> 
+#openshift_metrics_hawkular_hostname=<fqdn> 
+#openshift_metrics_cassandra_storage_type=(emptydir|pv|dynamic) 
+#metrics_image_version: v3.9.40
+#metrics_hawkular_hostname:
+#metrics_cassandra_storage_type: emptydir
+
+# EFK
+#openshift_logging_image_version == efk_image_version
+#efk_image_version: v3.9.40 
+
+# Node Upgrade
+#openshift_upgrade_infra_nodes_serial: "1" 
+#openshift_upgrade_app_nodes_serial: "20%" 
+#openshift_upgrade_infra_nodes_label: "region=infra"
+#openshift_upgrade_app_nodes_label: "region=app"
+
+## Node Upgrade Common variables
+#openshift_upgrade_nodes_max_fail_percentager: 20 
+#openshift_upgrade_nodes_drain_timeout: 600

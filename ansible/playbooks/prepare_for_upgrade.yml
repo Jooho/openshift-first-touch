@@ -23,7 +23,6 @@
          import_role:
            name: upgrade_prepare
          vars:
-           ocp_version: 3.7
            node_type: ansible-controller
 
        - name: Set Upgrade Prepare Ansible Controller 'Complete'
@@ -47,7 +46,6 @@
          import_role:
            name: upgrade_prepare
          vars:
-           ocp_version: 3.7
            node_type: ocp-host
 
        - name: Set Upgrade Prepare Nodes 'Complete'
