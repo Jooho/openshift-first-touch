@@ -45,4 +45,3 @@ $ cat ./vars/default.yml
 $ vi ./vars/override.yml
 ```
 
-
