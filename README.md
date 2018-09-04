@@ -1,7 +1,7 @@
 # openshift-first-touch
 
 ## Docs
-- [How to use](./docs/how-to-use)
+- [How to use](./docs/how-to-use.md)
 
 ## Playbook List
 - [Upgrade](./ansible/playbooks/upgrade)
