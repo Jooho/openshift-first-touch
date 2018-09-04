@@ -1,0 +1,24 @@
+- hosts: localhost
+  tasks:
+  - shell: "oc get node -l {{openshift_upgrade_infra_nodes_label}}  --no-headers -o name"
+    register: infra_nodes_list
+
+  - add_host:
+      name: "{{item|regex_replace('^nodes/','')}}"
+      groups: infra_nodes
+    with_items: "{{infra_nodes_list.stdout_lines}}"
+    
+  - shell: "oc get node -l {{openshift_upgrade_app_nodes_label}}  --no-headers -o name"
+    register: app_nodes_list
+
+  - add_host:
+      name: "{{item|regex_replace('^nodes/','')}}"
+      groups: app_nodes
+    with_items: "{{app_nodes_list.stdout_lines}}"
+      
+- hosts: infra_nodes
+  tasks:
+  - command: "echo {{inventory_hostname}}"
+- hosts: app_nodes
+  tasks:
+  - command: "echo {{inventory_hostname}}"
