@@ -1,25 +1,32 @@
 ocp_version: 3.7
+
+# Upgrade
 control_plane_upgrade_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/upgrades/v3_7/upgrade_control_plane.yml
 node_upgrade_yaml:  /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/upgrades/v3_7/upgrade_nodes.yml
 efk_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
 metrics_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
 
 
-# Metrics
+## Upgrade - Metrics
 #openshift_metrics_image_version=<tag> 
 #openshift_metrics_hawkular_hostname=<fqdn> 
 #openshift_metrics_cassandra_storage_type=(emptydir|pv|dynamic) 
+###############################################################
 metrics_image_version: v3.7.61
 #metrics_hawkular_hostname:
 metrics_cassandra_storage_type: emptydir
 
-# EFK
+## Upgrade - EFK
 #openshift_logging_image_version == efk_image_version
 efk_image_version: v3.7.61 
 
-# Node Upgrade
+## Upgrade - Node
+openshift_upgrade_master_nodes_serial: "50%" 
 openshift_upgrade_infra_nodes_serial: "1" 
 openshift_upgrade_app_nodes_serial: "20%" 
 openshift_upgrade_infra_nodes_label: "region=infra"
 openshift_upgrade_app_nodes_label: "region=app"
 
+## Node Upgrade Common variables
+openshift_upgrade_nodes_max_fail_percentager: 20 
+openshift_upgrade_nodes_drain_timeout: 600
