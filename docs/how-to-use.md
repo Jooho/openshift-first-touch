@@ -5,20 +5,20 @@ Each branch has separate ansible code based on OpenShift version.
 
 For example, if you are using OpenShift 3.9, you have to use branch 3.9. 
 
-As for variable, you can find default variable from *./vars/default.yml*. If you want to override default variable, please use “./vars/override.yml” file. One thing you have to check is the latest version of image. Do **NOT** change the default values from *./vars/defaults.yml
+As for variable, you can find default variable from *./vars/default.yml*. If you want to override default variable, please use *./vars/override.yml* file. One thing you have to check is the latest version of image. Do **NOT** change the default values from *./vars/defaults.yml*
 
 
 
 ## Clone git repository
 ```
-git clone https://github.com/Jooho/openshift-first-touch.git
+$ git clone https://github.com/Jooho/openshift-first-touch.git
 
-cd openshift-first-touch
+$ cd openshift-first-touch
 ```
 
 ## Check Branchs
 ```
- git branch -a
+$ git branch -a
 * master
   remotes/origin/3.7
   remotes/origin/3.9
