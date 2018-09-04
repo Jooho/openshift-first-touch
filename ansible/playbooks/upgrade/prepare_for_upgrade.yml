@@ -1,0 +1,58 @@
+
+- name: Initialization Checkpoint Start
+  hosts: all
+  gather_facts: false
+  roles:
+  - checkpoint
+
+- hosts: all
+  gather_facts: false
+  tasks:
+   - name: Block of upgrade prepare
+     block:
+       - name: Set Upgrade Prepare Ansible Controller 'In Progress'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_prepare_ansible:
+               title: "Upgrade - Prepare for Ansible Controller"
+               status: "In Progress"
+               start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+    
+       - name: Prepare for ansible controller
+         import_role:
+           name: upgrade_prepare
+         vars:
+           node_type: ansible-controller
+
+       - name: Set Upgrade Prepare Ansible Controller 'Complete'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_prepare_ansible:
+               status: "Complete"
+               end: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+ 
+       - name: Set Upgrade Prepare Nodes 'In Progress'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_prepare_node:
+               title: "Upgrade - Prepare for Nodes"
+               status: "In Progress"
+               start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+    
+       - name: Prepare for nodes
+         import_role:
+           name: upgrade_prepare
+         vars:
+           node_type: ocp-host
+
+       - name: Set Upgrade Prepare Nodes 'Complete'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_prepare_node:
+               status: "Complete"
+               end: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+ 

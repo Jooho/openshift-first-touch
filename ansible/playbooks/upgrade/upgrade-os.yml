@@ -1,0 +1,273 @@
+- name: Initialization Checkpoint Start
+  hosts: all
+  tags:
+  - always
+  gather_facts: false
+  roles:
+  - checkpoint
+
+- hosts: masters
+  tags:
+  - master
+  serial: "{{openshift_upgrade_master_nodes_serial}}"
+  gather_facts: false
+  pre_tasks:
+   - name: Block of upgrade os
+     block:
+       - name: Set Upgrade OS on Master 'In Progress'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_os_master:
+               title: "Upgrade - OS for Masters"
+               status: "In Progress"
+               start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+  tasks:
+       - name: Check if oc adm drain command is working 
+         command: "oc adm drain {{inventory_hostname}} --dry-run"
+         register: check_drain_cmd
+         delegate_to: "{{ groups.masters[0] }}" 
+         run_once: yes
+         ignore_errors: yes
+
+       - name: Fail if the command is working 
+         fail:
+           msg: "oc command is not working.. please login with an user who has cluster admin role"
+         when: check_drain_cmd.rc==1
+         delegate_to: localhost
+         run_once: yes
+
+
+       - name: Drain node
+         command: "oc adm drain {{ inventory_hostname }} --force --delete-local-data --ignore-daemonsets"
+         delegate_to: "{{ groups.masters[0] }}" 
+         until: "drain_node.stdout| regex_search('drained')"
+         retries: 100
+         register: drain_node
+
+       - name: upgrade all packages
+         yum:
+           name: '*'
+           state: latest
+         become: true
+   
+       - name: reboot host
+         shell: sleep 10 && /sbin/shutdown -r now
+         async: 300
+         poll: 0
+         become: true
+   
+       - name: waiting for server booting up
+         local_action: wait_for
+         args:
+           host: "{{ inventory_hostname }}"
+           port: 22
+           delay: 30
+           timeout: 600
+           state: started
+         become: false
+
+       - name: Make the node scheduable
+         command: "oc adm uncordon {{ inventory_hostname }}"
+         register: uncordon_node
+         until: uncordon_node.rc == 0
+         retries: 100
+         delegate_to: "{{ groups.masters[0] }}" 
+
+  post_tasks:
+       - name: Set Upgrade OS on Master 'Complete'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_os_master:
+               status: "Complete"
+               end: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+
+
+- hosts: localhost
+  tags:
+  - infra
+  - app
+  tasks:
+  - name: Get infra nodes list
+    shell: "oc get node -l {{openshift_upgrade_infra_nodes_label}}  --no-headers -o name"
+    register: infra_nodes_list
+ 
+  - name: Add infra nodes list to memory
+    add_host:
+      name: "{{item|regex_replace('^nodes/','')}}"
+      groups: infra_nodes
+    with_items: "{{infra_nodes_list.stdout_lines}}"
+
+  - name: Get app nodes list
+    shell: "oc get node -l {{openshift_upgrade_app_nodes_label}}  --no-headers -o name"
+    register: app_nodes_list
+
+  - name: Add app nodes list to memory
+    add_host:
+      name: "{{item|regex_replace('^nodes/','')}}"
+      groups: app_nodes
+    with_items: "{{app_nodes_list.stdout_lines}}"
+
+
+  
+- hosts: infra_nodes
+  tags:
+  - infra
+  serial: "{{openshift_upgrade_infra_nodes_serial}}"
+  gather_facts: false
+  pre_tasks:
+   - name: Block of upgrade os
+     block:
+       - name: Set Upgrade OS on Infra Nodes 'In Progress'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_os_infra:
+               title: "Upgrade - OS for Infra Nodes"
+               status: "In Progress"
+               start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+    
+  tasks:
+       - name: Check if oc adm drain command is working 
+         command: "oc adm drain {{inventory_hostname}} --dry-run"
+         register: check_drain_cmd
+         delegate_to: "{{ groups.masters[0] }}" 
+         run_once: yes
+         ignore_errors: yes
+
+       - name: Fail if the command is working 
+         fail:
+           msg: "oc command is not working.. please login with an user who has cluster admin role"
+         when: check_drain_cmd.rc==1
+         delegate_to: localhost
+         run_once: yes
+
+
+       - name: Drain node
+         command: "oc adm drain {{ inventory_hostname }} --force --delete-local-data --ignore-daemonsets"
+         delegate_to: "{{ groups.masters[0] }}" 
+         until: "drain_node.stdout| regex_search('drained')"
+         retries: 100
+         register: drain_node
+
+       - name: upgrade all packages
+         yum:
+           name: '*'
+           state: latest
+         become: true
+   
+       - name: reboot host
+         shell: sleep 10 && /sbin/shutdown -r now
+         async: 300
+         poll: 0
+         become: true
+   
+       - name: waiting for server booting up
+         local_action: wait_for
+         args:
+           host: "{{ inventory_hostname }}"
+           port: 22
+           delay: 30
+           timeout: 600
+           state: started
+         become: false
+
+       - name: Make the node scheduable
+         command: "oc adm uncordon {{ inventory_hostname }}"
+         register: uncordon_node
+         until: uncordon_node.rc == 0
+         retries: 100
+         delegate_to: "{{ groups.masters[0] }}" 
+
+  post_tasks:
+       - name: Set Upgrade OS on Infra Nodes 'Complete'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_os_infra:
+               status: "Complete"
+               end: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+
+
+
+  
+- hosts: app_nodes
+  tags:
+  - app
+  serial: "{{openshift_upgrade_app_nodes_serial}}"
+  gather_facts: false
+  pre_tasks:
+   - name: Block of upgrade os
+     block:
+       - name: Set Upgrade OS on App Nodes 'In Progress'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_os_app:
+               title: "Upgrade - OS for App Nodes"
+               status: "In Progress"
+               start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+    
+  tasks:
+       - name: Check if oc adm drain command is working 
+         command: "oc adm drain {{inventory_hostname}} --dry-run"
+         register: check_drain_cmd
+         delegate_to: "{{ groups.masters[0] }}" 
+         run_once: yes
+         ignore_errors: yes
+
+       - name: Fail if the command is working 
+         fail:
+           msg: "oc command is not working.. please login with an user who has cluster admin role"
+         when: check_drain_cmd.rc==1
+         delegate_to: localhost
+         run_once: yes
+
+
+       - name: Drain node
+         command: "oc adm drain {{ inventory_hostname }} --force --delete-local-data --ignore-daemonsets"
+         delegate_to: "{{ groups.masters[0] }}" 
+         until: "drain_node.stdout| regex_search('drained')"
+         retries: 100
+         register: drain_node
+
+       - name: upgrade all packages
+         yum:
+           name: '*'
+           state: latest
+         become: true
+   
+       - name: reboot host
+         shell: sleep 10 && /sbin/shutdown -r now
+         async: 300
+         poll: 0
+         become: true
+   
+       - name: waiting for server booting up
+         local_action: wait_for
+         args:
+           host: "{{ inventory_hostname }}"
+           port: 22
+           delay: 30
+           timeout: 600
+           state: started
+         become: false
+
+       - name: Make the node scheduable
+         command: "oc adm uncordon {{ inventory_hostname }}"
+         register: uncordon_node
+         until: uncordon_node.rc == 0
+         retries: 100
+         delegate_to: "{{ groups.masters[0] }}" 
+
+  post_tasks:
+       - name: Set Upgrade OS on App Nodes 'Complete'
+         run_once: true
+         set_stats:
+           data:
+             upgrade_phase_os_app:
+               status: "Complete"
+               end: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+
+
