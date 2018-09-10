@@ -1,0 +1,29 @@
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: test-pvc
+spec:
+ accessModes:
+  - ReadWriteMany
+ resources:
+   requests:
+     storage: 1Gi
+ storageClassName: example-nfs
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: test-pod
+spec:
+  containers:
+  - name: test-pod
+    image: docker.io/ljhiyh/smoke:latest
+    volumeMounts:
+      - name: nfs-pvc
+        mountPath: "/mnt"
+  restartPolicy: "Never"
+  volumes:
+    - name: nfs-pvc
+      persistentVolumeClaim:
+        claimName: test-pvc
