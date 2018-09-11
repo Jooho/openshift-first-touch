@@ -37,6 +37,8 @@ oc process -f deployment.yaml -p NFS_SERVER=nfs.exmale.com -p NFS_PATH=/exports-
 
 
 oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:nfs-client-provisioner:nfs-client-provisioner
+
+oc patch sc managed-nfs-storage -p   '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true" }}}'
 ```
 
 
