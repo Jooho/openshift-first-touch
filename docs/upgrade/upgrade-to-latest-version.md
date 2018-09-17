@@ -2,6 +2,12 @@
 
 **[Setup Ansible Script Repository](./how-to-use.md)** - *Use 3.7 branch*
 
+## Check List
+- ETCD v3?
+- openshift_deployment_type=openshift-enterprise
+- openshift_rolling_restart_mode=system (services -> do not reboot node)
+
+
 ## Update variables
 Do not change the default values from “./vars/defaults.yml” 
 If you want to override default variable, please use “./vars/override.yml” file. One thing you have to check is the latest version of image.
@@ -35,6 +41,13 @@ $ vi vars/override.yml
 
 
 ## Upgrade Phase 
+
+### Execute upgrade checking playbook
+```
+ansible-playbook -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/upgrades/v3_7/upgrade.yml --tags pre_upgrade
+
+```
+
 ### Simple Inplace upgrade 
 *Pre-requisites: Ansible Playbook: prepare_for_upgrade.yml*
 - Refresh subscription (for all nodes)
