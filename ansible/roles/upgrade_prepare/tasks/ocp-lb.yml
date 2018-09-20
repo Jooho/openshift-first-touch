@@ -1,0 +1,4 @@
+- name: Common preresuities
+  import_tasks: common.yml
+  become: true
+  become_user: root

@@ -5,7 +5,7 @@
   roles:
   - checkpoint
 
-- hosts: all
+- hosts: localhost
   gather_facts: false
   tasks:
    - name: Block of upgrade prepare
@@ -18,7 +18,7 @@
                title: "Upgrade - Prepare for Ansible Controller"
                status: "In Progress"
                start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
-    
+
        - name: Prepare for ansible controller
          import_role:
            name: upgrade_prepare
@@ -32,7 +32,18 @@
              upgrade_phase_prepare_ansible:
                status: "Complete"
                end: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
- 
+
+- hosts: all
+  gather_facts: false
+  pre_tasks:
+   - set_fact:
+       d_node_type: ocp-host
+     when: not inventory_hostname in groups['lb']
+   - set_fact:
+       d_node_type: ocp-lb
+     when: inventory_hostname in groups['lb']
+  tasks:
+     block:
        - name: Set Upgrade Prepare Nodes 'In Progress'
          run_once: true
          set_stats:
@@ -46,7 +57,7 @@
          import_role:
            name: upgrade_prepare
          vars:
-           node_type: ocp-host
+           node_type: "{{d_node_type}}"
 
        - name: Set Upgrade Prepare Nodes 'Complete'
          run_once: true
