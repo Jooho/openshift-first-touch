@@ -19,12 +19,6 @@
 #  become: true
 #  become_user: root
 
-- name: Change repos
-  set_fact:
-    disable_repos: "--disable=rhel-7-server-ose-3.7-rpms"
-    enable_repos: "--enable=rhel-7-server-ose-3.9-rpms --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-ansible-2.4-rpms --enable=rhel-7-fast-datapath-rpms"
-  when: "ocp_version == 3.9"
-
 - name: Enable/Disable repositories 
   shell: "{{ item }}"
   with_items:

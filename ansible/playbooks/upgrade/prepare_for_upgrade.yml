@@ -1,11 +1,10 @@
-
 - name: Initialization Checkpoint Start
   hosts: all
   gather_facts: false
   roles:
   - checkpoint
 
-- hosts: all
+- hosts: localhost
   gather_facts: false
   tasks:
    - name: Block of upgrade prepare
@@ -23,7 +22,6 @@
          import_role:
            name: upgrade_prepare
          vars:
-           ocp_version: 3.7
            node_type: ansible-controller
 
        - name: Set Upgrade Prepare Ansible Controller 'Complete'
@@ -34,6 +32,18 @@
                status: "Complete"
                end: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
  
+- hosts: all
+  gather_facts: false
+  pre_tasks:
+   - set_fact:
+       d_node_type: ocp-host
+     when: not inventory_hostname in groups['lb']
+   - set_fact:
+       d_node_type: ocp-lb
+     when: inventory_hostname in groups['lb']
+  tasks:
+   - name: Block of upgrade prepare
+     block:
        - name: Set Upgrade Prepare Nodes 'In Progress'
          run_once: true
          set_stats:
@@ -47,8 +57,7 @@
          import_role:
            name: upgrade_prepare
          vars:
-           ocp_version: 3.7
-           node_type: ocp-host
+           node_type: "{{d_node_type}}"
 
        - name: Set Upgrade Prepare Nodes 'Complete'
          run_once: true
