@@ -28,7 +28,10 @@ If you want to install NFS server, you can use this [NFS Server installation ans
 
 ## Deploy Steps
 ```
+cd openshift-first-touch/scripts/storage/nfs-client-provisioner
+
 oc new-project nfs-client-provisioner
+
 oc process -f deployment.yaml -p NFS_SERVER=$NFS_SERVER_HOST_IP -p NFS_PATH=$NFS_FODLER_PATH -p NAMESPACE=nfs-client-provisioner |oc create -f -
 
 
@@ -39,6 +42,10 @@ oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:nfs-client-
 
 oc create -f storageClass.yaml 
 
+```
+
+Tip. Make it to default SC
+```
 oc patch sc managed-nfs-storage -p   '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true" }}}'
 ```
 
