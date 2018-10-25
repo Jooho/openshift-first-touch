@@ -5,6 +5,14 @@
 ## Update variables
 Do not change the default values from “./vars/defaults.yml” 
 If you want to override default variable, please use “./vars/override.yml” file. One thing you have to check is the latest version of image.
+
+## Export Environment Variables
+```
+export API_SERVER=openshift.example.com:8443
+```
+
+
+
 ```
 $ vi vars/override.yml
 
@@ -54,9 +62,9 @@ $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade-to-latest-version.y
 
 #### Check Control Plane
 ```
-$ curl $API_SERVER:8443/healthz
+$ curl $API_SERVER/healthz
 ok
-$ curl $API_SERVER:8443/version
+$ curl $API_SERVER/version
 {
   "major": "1",
   "minor": "9",
@@ -70,7 +78,7 @@ $ curl $API_SERVER:8443/version
 }
 
 
-$ curl $API_SERVER:8443/version/openshift
+$ curl $API_SERVER/version/openshift
 {
   "major": "3",
   "minor": "9+",
