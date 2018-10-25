@@ -70,13 +70,13 @@ ansible-playbook -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/play
 $ ansible-playbook -i /etc/ansible/hosts ./playbooks/prepare_for_upgrade.yml 
 ```
 
-#### Upgrade to the latest version of OCP 3.7 Control Plane
+### Upgrade to the latest version of OCP 3.7 Control Plane
 *Commands*
 ```
 $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade-to-latest-version.yml --tag always,control_plane --skip-tags efk,metrics -e @vars/default.yml -vvvv
 ```
 
-#### Check Control Plane
+### Check Control Plane
 ```
 $ curl -k $API_SERVER/healthz
 ok
@@ -103,7 +103,7 @@ $ curl -k $API_SERVER/version/openshift
 }
 ```
 
-#### Upgrade to the latest version of OCP 3.7 Infra Nodes 
+### Upgrade to the latest version of OCP 3.7 Infra Nodes 
 *Commands*
 ```
 $ cat vars/default.yml
@@ -115,7 +115,7 @@ openshift_upgrade_infra_nodes_label: "region=infra"
 $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,infra --skip-tags efk,metrics -e @vars/default.yml 
 ```
 
-#### Upgrade to the latest version of OCP 3.7 App Nodes
+### Upgrade to the latest version of OCP 3.7 App Nodes
 *Commands*
 ```
 $ cat vars/default.yml
@@ -127,7 +127,7 @@ $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-v
 ```
 
 
-#### Upgrade the EFK Logging stack
+### Upgrade the EFK Logging stack
 
 *Check List:*
 - Fluentd DC/DS has following config, then change “IfNotPresent” to “Always”
@@ -168,7 +168,7 @@ logging-kibana-v3.7.61-2
 logging-auth-proxy-v3.7.61-2
 ```
 
-#### Upgrade the Cluster Metrics
+### Upgrade the Cluster Metrics
 
 *Commands*
 ```
@@ -183,5 +183,13 @@ metrics-cassandra-v3.7.61-11
 metrics-hawkular-metrics-v3.7.61-11
 metrics-heapster-v3.7.61-11
 ```
+
+### Upgrade Service Catalog
+
+*Commands*
+```
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade-to-latest-version.yml --tag always,catalog --skip-tags efk -e @vars/default.yml 
+```
+
 
 [Verify latest version of OCP](./verify-ocp-health.md)
