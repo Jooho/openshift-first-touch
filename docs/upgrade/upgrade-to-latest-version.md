@@ -73,7 +73,7 @@ $ ansible-playbook -i /etc/ansible/hosts ./playbooks/prepare_for_upgrade.yml
 ### Upgrade to the latest version of OCP 3.7 Control Plane
 *Commands*
 ```
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade-to-latest-version.yml --tag always,control_plane --skip-tags efk,metrics -e @vars/default.yml -vvvv
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,control_plane --skip-tags efk,metrics -e @vars/default.yml -vvvv
 ```
 
 ### Check Control Plane
@@ -153,7 +153,7 @@ $ cat vars/default.yml
 ...
 efk_image_version: 3.7.61
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade-to-latest-version.yml --tag always,efk --skip-tags metrics -e @vars/default.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,efk --skip-tags metrics -e @vars/default.yml 
 ```
 
 #### New container image version check
@@ -172,7 +172,7 @@ logging-auth-proxy-v3.7.61-2
 
 *Commands*
 ```
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade-to-latest-version.yml --tag always,metrics --skip-tags efk -e @vars/default.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,metrics --skip-tags efk -e @vars/default.yml 
 ```
 
 #### New container image version check
@@ -188,7 +188,7 @@ metrics-heapster-v3.7.61-11
 
 *Commands*
 ```
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade-to-latest-version.yml --tag always,catalog --skip-tags efk -e @vars/default.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,catalog --skip-tags efk,metrics -e @vars/default.yml 
 ```
 
 
