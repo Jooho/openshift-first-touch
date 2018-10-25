@@ -112,7 +112,7 @@ openshift_upgrade_infra_nodes_serial: "1"
 openshift_upgrade_infra_nodes_label: "region=infra"
 
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade-to-latest-version.yml --tag always,infra --skip-tags efk,metrics -e @vars/default.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,infra --skip-tags efk,metrics -e @vars/default.yml 
 ```
 
 #### Upgrade to the latest version of OCP 3.7 App Nodes
@@ -123,7 +123,7 @@ $ cat vars/default.yml
 openshift_upgrade_app_nodes_serial: "20%" 
 openshift_upgrade_app_nodes_label: "region=app"
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade-to-latest-version.yml --tag always,app --skip-tags efk,metrics -e @vars/default.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,app --skip-tags efk,metrics -e @vars/default.yml 
 ```
 
 
