@@ -6,10 +6,16 @@
 - ETCD v3?
 - openshift_deployment_type=openshift-enterprise
 - openshift_rolling_restart_mode=system (services -> do not reboot node)
+- Comment out `openshift_pkg_version`
+- Validate OpenShift Container Platform storage migration 
+  ```
+  $ oc adm migrate storage --include=* --loglevel=2 --confirm --config /etc/origin/master/admin.kubeconfig
+  ```
+
 
 ## Export Environment Variables
 ```
-export API_SERVER=openshift.example.com:8443
+export API_SERVER=https://openshift.example.com:8443
 ```
 
 ## Update variables
@@ -72,9 +78,9 @@ $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade-to-latest-version.y
 
 #### Check Control Plane
 ```
-$ curl $API_SERVER/healthz
+$ curl -k $API_SERVER/healthz
 ok
-$ curl $API_SERVER/version
+$ curl -k $API_SERVER/version
 {
   "major": "1",
   "minor": "7",
@@ -87,7 +93,7 @@ $ curl $API_SERVER/version
   "platform": "linux/amd64"
 }
 
-$ curl $API_SERVER/version/openshift
+$ curl -k $API_SERVER/version/openshift
 {
   "major": "3",
   "minor": "7",
