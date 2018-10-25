@@ -7,11 +7,16 @@
 - openshift_deployment_type=openshift-enterprise
 - openshift_rolling_restart_mode=system (services -> do not reboot node)
 
+## Export Environment Variables
+```
+export API_SERVER=openshift.example.com:8443
+```
 
 ## Update variables
 Do not change the default values from “./vars/defaults.yml” 
 If you want to override default variable, please use “./vars/override.yml” file. One thing you have to check is the latest version of image.
 ```
+$ cd openshift-first-touch/ansible
 $ vi vars/override.yml
 
 ## Upgrade - Metrics
@@ -67,9 +72,9 @@ $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade-to-latest-version.y
 
 #### Check Control Plane
 ```
-$ curl $API_SERVER:8443/healthz
+$ curl $API_SERVER/healthz
 ok
-$ curl $API_SERVER:8443/version
+$ curl $API_SERVER/version
 {
   "major": "1",
   "minor": "7",
@@ -82,7 +87,7 @@ $ curl $API_SERVER:8443/version
   "platform": "linux/amd64"
 }
 
-$ curl $API_SERVER:8443/version/openshift
+$ curl $API_SERVER/version/openshift
 {
   "major": "3",
   "minor": "7",
