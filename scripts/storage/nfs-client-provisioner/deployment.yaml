@@ -89,9 +89,9 @@ objects:
               - name: PROVISIONER_NAME
                 value: fuseim.pri/ifs
               - name: NFS_SERVER
-                value: dhcp182-21.gsslab.rdu2.redhat.com
+                value: "${NFS_SERVER}"
               - name: NFS_PATH
-                value: /exports-nfs
+                value: "${NFS_PATH}"
         volumes:
           - name: nfs-client-root
             nfs:
