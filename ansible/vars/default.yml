@@ -5,6 +5,7 @@ control_plane_upgrade_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/o
 node_upgrade_yaml:  /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/upgrades/v3_7/upgrade_nodes.yml
 efk_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-logging.yml
 metrics_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml
+service_catalog_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/service-catalog.yml
 
 
 ## Upgrade - Metrics
@@ -12,13 +13,13 @@ metrics_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-clust
 #openshift_metrics_hawkular_hostname=<fqdn> 
 #openshift_metrics_cassandra_storage_type=(emptydir|pv|dynamic) 
 ###############################################################
-metrics_image_version: v3.7.61
+metrics_image_version: v3.7.64
 #metrics_hawkular_hostname:
 metrics_cassandra_storage_type: emptydir
 
 ## Upgrade - EFK
 #openshift_logging_image_version == efk_image_version
-efk_image_version: v3.7.61 
+efk_image_version: v3.7.64 
 
 ## Upgrade - Node
 openshift_upgrade_master_nodes_serial: "50%" 

@@ -113,7 +113,7 @@
         - efk 
    
 - name: Upgrade EFK Logging stack
-  import_playbook: "{{efk_yaml}} openshift_logging_install_logging=false openshift_logging_image_version={{efk_image_version}}"
+  import_playbook: "{{efk_yaml}} openshift_logging_install_logging=true openshift_logging_image_version={{efk_image_version}}"
   tags: [efk]
           
 - hosts: localhost
@@ -155,3 +155,35 @@
             status: "Complete"
       tags:
         - metrics
+
+
+- hosts: localhost
+  tasks:
+    - name: Set Service Catalog 'In Progress'
+      run_once: true
+      set_stats:
+        data:
+          upgrade_phase_service_catalog:
+            title: "Upgrade - Service Catalog"
+            status: "In Progress"
+            start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+      tags:
+        - catalog
+
+- name: Upgrade Service Catalog
+  include: "{{service_catalog_yaml}} openshift_enable_service_catalog=true ansible_service_broker_install=true template_service_broker_install=true"
+  tags:
+    - catalog
+
+- hosts: localhost
+  tasks:
+    - name: Set Upgrade Service Catalog 'Complete'
+      run_once: true
+      set_stats:
+        data:
+          upgrade_phase_service_catalog:
+            status: "Complete"
+      tags:
+        - catalog
+
+
