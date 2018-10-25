@@ -1,6 +1,12 @@
 Verify OpenShift Health
 -----------------------
 
+##Export Environment Variables
+```
+export API_SERVER=openshift.example.com:8443
+```
+
+
 ## Deploy Test Application for Verification
 
 *Commands*
@@ -20,11 +26,11 @@ $ while true; do  echo $(date) >> /tmp/test.out ;curl smoke.<SUBDOMAIN> >> /tmp/
 ### API Server
 ```
 # Health_check
-$ curl $API_SERVER:8443/healthz
+$ curl $API_SERVER/healthz
 # Kubernetes api version
-$ curl $API_SERVER:8443/version
+$ curl $API_SERVER/version
 # Openshift version
-$ curl $API_SERVER:8443/version/openshift
+$ curl $API_SERVER/version/openshift
 ```
 
 ### Registry
