@@ -4,6 +4,7 @@
 - [How to use](./docs/how-to-use.md)
 - Upgrade
   - [Micro/Minor upgrade](./docs/upgrade/upgrade-to-latest-version.md)
+  - [OS upgrade](./docs/upgrade/upgrade-os.md)
   - [Verify OpenShift Health](./docs/upgrade/verify-ocp-health.md)
 - NFS Provisioner
   - [NFS provisioner](./docs/storage/nfs/nfs-provisioner.md)
