@@ -178,4 +178,4 @@ metrics-hawkular-metrics-v3.7.61-11
 metrics-heapster-v3.7.61-11
 ```
 
-[Verify latest version of OCP](./verify-ocp-health.yml)
+[Verify latest version of OCP](./verify-ocp-health.md)
