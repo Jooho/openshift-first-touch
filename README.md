@@ -3,7 +3,7 @@
 ## Docs
 - [How to use](./docs/how-to-use.md)
 - Upgrade
-  - [Micro/Minor upgrade](./docs/upgrade/upgrade-to-latest-version.md)
+  - [Micro/Minor upgrade](./docs/upgrade/upgrade.md)
   - [OS upgrade](./docs/upgrade/upgrade-os.md)
   - [Verify OpenShift Health](./docs/upgrade/verify-ocp-health.md)
 - NFS Provisioner

@@ -10,10 +10,14 @@
 
 - Remove `openshift_schedulable` for each master from ansible inventory file
 
+
 - Update version related parameter in inventory file 
+ 
   ```
   openshift_release="3.9"
-  ...
+  openshift_version="3.9"
+          ...
+          ...
   ```
 - [Disable SWAP](https://docs.openshift.com/container-platform/3.9/admin_guide/overcommit.html#disabling-swap-memory)
   ```
@@ -24,6 +28,7 @@
   ```
   openshift_rolling_restart_mode=system
   ``` 
+
 - Update ansible inventory file if you did some manual configuration.(ex, admissionConfig)
 
 - After upgrade, reboot all hosts
@@ -85,6 +90,7 @@ ansible-playbook -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/play
 ### Upgrade to the latest version of OCP 3.9 Control Plane
 *Commands*
 ```
+
 $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,control_plane --skip-tags efk,metrics -e @vars/default.yml -e @vars/override.yml -vvvv
 ```
 
@@ -137,7 +143,9 @@ $ cat vars/default.yml
 openshift_upgrade_app_nodes_serial: "20%" 
 openshift_upgrade_app_nodes_label: "region=app"
 
+
 $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,app --skip-tags efk,metrics -e @vars/default.yml -e @vars/override.yml 
+
 ```
 
 
