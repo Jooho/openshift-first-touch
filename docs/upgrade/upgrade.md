@@ -12,14 +12,13 @@
 
 
 - Update version related parameter in inventory file 
-  
+ 
   ```
   openshift_release="3.9"
   openshift_version="3.9"
           ...
           ...
   ```
-  
 - [Disable SWAP](https://docs.openshift.com/container-platform/3.9/admin_guide/overcommit.html#disabling-swap-memory)
   ```
   ansible -i /etc/ansible/hosts all -m shell -a "swapoff -a"
