@@ -73,7 +73,8 @@ $ ansible-playbook -i /etc/ansible/hosts ./playbooks/prepare_for_upgrade.yml
 ### Upgrade to the latest version of OCP 3.7 Control Plane
 *Commands*
 ```
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,control_plane --skip-tags efk,metrics,catalog -e @vars/default.yml -vvvv
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,control_plane --skip-tags efk,metrics,catalog -e @vars/default.yml -e @vars/override.yml
+ -vvvv
 ```
 
 ### Check Control Plane
@@ -112,7 +113,7 @@ openshift_upgrade_infra_nodes_serial: "1"
 openshift_upgrade_infra_nodes_label: "region=infra"
 
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,infra --skip-tags efk,metrics,catalog -e @vars/default.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,infra --skip-tags efk,metrics,catalog -e @vars/default.yml -e @vars/override.yml
 ```
 
 ### Upgrade to the latest version of OCP 3.7 App Nodes
@@ -123,7 +124,7 @@ $ cat vars/default.yml
 openshift_upgrade_app_nodes_serial: "20%" 
 openshift_upgrade_app_nodes_label: "region=app"
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,app --skip-tags efk,metrics,catalog -e @vars/default.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,app --skip-tags efk,metrics,catalog -e @vars/default.yml -e @vars/override.yml
 ```
 
 
@@ -153,7 +154,7 @@ $ cat vars/default.yml
 ...
 efk_image_version: 3.7.61
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,efk --skip-tags metrics,catalog -e @vars/default.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,efk --skip-tags metrics,catalog -e @vars/default.yml -e @vars/override.yml
 ```
 
 #### New container image version check
@@ -172,7 +173,7 @@ logging-auth-proxy-v3.7.61-2
 
 *Commands*
 ```
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,metrics --skip-tags efk,catalog -e @vars/default.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,metrics --skip-tags efk,catalog -e @vars/default.yml -e @vars/override.yml
 ```
 
 #### New container image version check
@@ -188,7 +189,7 @@ metrics-heapster-v3.7.61-11
 
 *Commands*
 ```
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,catalog --skip-tags efk,metrics -e @vars/default.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,catalog --skip-tags efk,metrics -e @vars/default.yml  -e @vars/override.yml
 ```
 
 ### Migrate ETCD v2 to v3
