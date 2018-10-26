@@ -43,6 +43,7 @@
        d_node_type: ocp-lb
      when: inventory_hostname in groups['lb']
   tasks:
+   - name: Block of upgrade prepare
      block:
        - name: Set Upgrade Prepare Nodes 'In Progress'
          run_once: true
