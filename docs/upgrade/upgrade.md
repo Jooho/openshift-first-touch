@@ -1,6 +1,6 @@
 # Prepare Phase
 
-**[Setup Ansible Script Repository](./how-to-use.md)** - *Use 3.9 branch*
+**[Setup Ansible Script Repository](./how-to-use.md)** - *Use 3.10 branch*
 
 ## Check List
 - Validate OpenShift Container Platform storage migration
@@ -8,22 +8,48 @@
    $ oc adm migrate storage --include=* --loglevel=2 --confirm 
   ```
 
-- Remove `openshift_schedulable` for each master from ansible inventory file
+- Change Node Label to [Node Group](https://docs.openshift.com/container-platform/3.10/upgrading/automated_upgrades.html#upgrades-defining-node-group-and-host-mappings)
+  ```
+  openshift_node_groups=[{'name': 'node-config-master', 'labels': ['node-role.kubernetes.io/master=true']}, {'name': 'node-config-infra', 'labels': ['node-role.kubernetes.io/infra=true',]}, {'name': 'node-config-compute', 'labels': ['node-role.kubernetes.io/compute=true'], 'edits': [{ 'key': 'kubeletArguments.pods-per-core','value': ['20']}]}]
+  ```
+
+- `openshift_hostname` parameter is removed so remove it from inventory file. Instead, `openshift_kubelet_name_override` must be set with the value of `openshift_hostname` that you used in previous versions.
 
 
 - Update version related parameter in inventory file 
  
   ```
-  openshift_release="3.9"
-  openshift_version="3.9"
+  openshift_release="3.10"
+  openshift_version="3.10"
           ...
           ...
   ```
-- [Disable SWAP](https://docs.openshift.com/container-platform/3.9/admin_guide/overcommit.html#disabling-swap-memory)
+- BackUp
+  - Master
   ```
-  ansible -i /etc/ansible/hosts all -m shell -a "swapoff -a"
+  /usr/lib/systemd/system/atomic-openshift-master-api.service
+  /usr/lib/systemd/system/atomic-openshift-master-controllers.service
+  /etc/sysconfig/atomic-openshift-master-api
+  /etc/sysconfig/atomic-openshift-master-controllers
+  /etc/origin/master/master-config.yaml
+  /etc/origin/master/scheduler.json
   ```
+  - Node
+  ```
+  /usr/lib/systemd/system/atomic-openshift-*.service
+  /etc/origin/node/node-config.yaml
+  ```
+  - [ETCD](https://docs.openshift.com/container-platform/3.10/day_two_guide/environment_backup.html#etcd-backup_environment-backup)
+  ```
+  /etc/etcd/etcd.conf 
+  
+   ssh master-0
+   mkdir -p /backup/etcd-config-$(date +%Y%m%d)/
+   cp -R /etc/etcd/ /backup/etcd-config-$(date +%Y%m%d)/
+  ```
+  - [ETCD DB](https://docs.openshift.com/container-platform/3.10/day_two_guide/environment_backup.html#etcd-backup_environment-backup)
 
+  
 - By default, only openshift service will be restarted. If you want to restart system(node), specify below in inventory file
   ```
   openshift_rolling_restart_mode=system
@@ -33,6 +59,13 @@
 
 - After upgrade, reboot all hosts
 
+
+## Noticeable Change
+- Node ConfigMaps
+  ```
+  Changes should not be made to a node host’s /etc/origin/node/node-config.yaml file. They will be overwritten by the configuration defined in the ConfigMap used by the node.
+  ```
+  - default node group (/usr/share/ansible/openshift-ansible/roles/openshift_facts/defaults/main.yml) 
 ## Export Environment Variables
 ```
 export API_SERVER=https://openshift.example.com:8443
@@ -48,13 +81,13 @@ $ vi vars/override.yml
 #openshift_metrics_image_version=<tag>
 #openshift_metrics_hawkular_hostname=<fqdn>
 #openshift_metrics_cassandra_storage_type=(emptydir|pv|dynamic)
-#metrics_image_version: v3.9.40
+#metrics_image_version: v3.10.10
 #metrics_hawkular_hostname:
 #metrics_cassandra_storage_type: emptydir
 
 # EFK
 #openshift_logging_image_version == efk_image_version
-#efk_image_version: v3.9.40
+#efk_image_version: v3.10.10
 
 # Node Upgrade
 #openshift_upgrade_master_nodes_serial: "50%"
@@ -74,7 +107,7 @@ $ vi vars/override.yml
 
 *Pre-requisites: Ansible Playbook: prepare_for_upgrade.yml*
 - Refresh subscription (for all nodes)
-- Change repositories (3.9)
+- Change repositories (3.10)
 - Reinstall ansible-openshift-utils on Ansible Controller
 
 *Commands*
@@ -87,7 +120,7 @@ $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/prepare_for_upgrade
 ansible-playbook -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
 ```
 
-### Upgrade to the latest version of OCP 3.9 Control Plane
+### Upgrade to the latest version of OCP 3.10 Control Plane
 *Commands*
 ```
 
@@ -123,7 +156,7 @@ $ curl -k $API_SERVER/version/openshift
 
 ```
 
-### Upgrade to the latest version of OCP 3.9 Infra Nodes 
+### Upgrade to the latest version of OCP 3.10 Infra Nodes 
 *Commands*
 ```
 $ cat vars/default.yml
@@ -135,7 +168,7 @@ openshift_upgrade_infra_nodes_label: "region=infra"
 $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,infra --skip-tags efk,metrics -e @vars/default.yml -e @vars/override.yml 
 ```
 
-### Upgrade to the latest version of OCP 3.9 App Nodes
+### Upgrade to the latest version of OCP 3.10 App Nodes
 *Commands*
 ```
 $ cat vars/default.yml
@@ -162,12 +195,12 @@ imagePullPolicy: IfNotPresent
 ```
 $ oc get po -n logging -o 'go-template={{range $pod := .items}}{{if eq $pod.status.phase "Running"}}{{range $container := $pod.spec.containers}}oc exec -c {{$container.name}} {{$pod.metadata.name}} -n logging -- find /root/buildinfo -name Dockerfile-openshift* | grep -o logging.* {{"\n"}}{{end}}{{end}}{{end}}' | bash -
 
-logging-curator-v3.7.61-2
-logging-elasticsearch-v3.7.61-2
-...
-logging-fluentd-v3.7.61-2
-logging-kibana-v3.7.61-2
-logging-auth-proxy-v3.7.61-2
+logging-curator-v3.9.40-2
+logging-elasticsearch-v3.9.40-2
+logging-fluentd-v3.9.40-2
+…..
+logging-kibana-v3.9.40-2
+logging-auth-proxy-v3.9.40-2
 
 ```
 
@@ -175,7 +208,7 @@ logging-auth-proxy-v3.7.61-2
 ```
 $ cat vars/default.yml
 ...
-efk_image_version: 3.7.61
+efk_image_version: 3.9.10
 
 $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,efk --skip-tags metrics -e @vars/default.yml -e @vars/override.yml 
 ```
