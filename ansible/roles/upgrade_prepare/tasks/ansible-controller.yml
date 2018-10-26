@@ -5,16 +5,16 @@
   run_once: yes
   become: true
   become_user: root
-  
-- name: Update atomic-openshift-utils/atomic-openshift-clients
-  yum:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-  - atomic-openshift-utils
-  - atomic-openshift-clients
-  delegate_to: localhost
-  run_once: yes
-  become: true
-  become_user: root
+
+#- name: Update atomic-openshift-utils/atomic-openshift-clients
+#  yum:
+#    name: "{{ item }}"
+#    state: latest
+#  with_items:
+#  - atomic-openshift-utils
+#  - atomic-openshift-clients
+#  delegate_to: localhost
+#  run_once: yes
+#  become: true
+#  become_user: root
   

@@ -2,7 +2,7 @@ Upgrade OS
 ----------
 
 
-### [Setup Ansible Script Repository](./how-to-use.md)
+### [Setup Ansible Script Repository](../how-to-use.md)
 
 ### Update default variables
 ```
