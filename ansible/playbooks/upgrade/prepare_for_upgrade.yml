@@ -37,10 +37,10 @@
   pre_tasks:
    - set_fact:
        d_node_type: ocp-host
-     when: not inventory_hostname in groups['lb']
+     when: 'lb' in groups and not inventory_hostname in groups['lb']
    - set_fact:
        d_node_type: ocp-lb
-     when: inventory_hostname in groups['lb']
+     when: 'lb' in groups and inventory_hostname in groups['lb']
   tasks:
    - name: Block of upgrade prepare
      block:
