@@ -1,0 +1,22 @@
+---
+- name: Check etcd version
+  shell: etcdctl -v|grep -i API|cut -d: -f2 |tr -d ' '
+  register: etcd_api_version
+
+
+- name: Backing up ETCD configuration files
+  shell: "{{ item }}"
+  with_items:
+  - "mkdir -p /backup/etcd-config-$(date +%Y%m%d)/"
+  - "cp -R /etc/etcd/ /backup/etcd-config-$(date +%Y%m%d)/"
+
+
+- name: Backing up ETCD data
+  shell: " etcdctl --cert-file=/etc/etcd/peer.crt \
+          --key-file=/etc/etcd/peer.key \
+          --ca-file=/etc/etcd/ca.crt \
+          --peers="https://*master-0.example.com*:2379,\
+          https://*master-1.example.com*:2379,\
+          https://*master-2.example.com*:2379"\
+          cluster-health"
+  when: etcd_api_version.std_out == '2'

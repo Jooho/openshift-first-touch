@@ -15,7 +15,7 @@ service_catalog_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshi
 ###############################################################
 metrics_image_version: v3.7.64
 #metrics_hawkular_hostname:
-#metrics_cassandra_storage_type: emptydir
+metrics_cassandra_storage_type: emptydir
 
 ## Upgrade - EFK
 #openshift_logging_image_version == efk_image_version
