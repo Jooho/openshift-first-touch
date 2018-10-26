@@ -101,7 +101,7 @@
 
    
 - name: Upgrade EFK Logging stack
-  import_playbook: "{{efk_yaml}} openshift_logging_install_logging=false openshift_logging_image_version={{efk_image_version}}"
+  import_playbook: "{{efk_yaml}} openshift_logging_install_logging=true openshift_logging_image_version={{efk_image_version}}"
   tags: [efk]
           
 
