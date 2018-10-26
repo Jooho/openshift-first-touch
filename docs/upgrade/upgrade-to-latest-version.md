@@ -191,5 +191,10 @@ metrics-heapster-v3.7.61-11
 $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade-to-latest-version.yml --tag always,catalog --skip-tags efk,metrics -e @vars/default.yml 
 ```
 
+### Migrate ETCD v2 to v3
+```
+$ etcdctl -v
+$ ansible-playbook -i /etc/ansible/hosts   /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-etcd/migrate.yml
+```
 
 [Verify latest version of OCP](./verify-ocp-health.md)
