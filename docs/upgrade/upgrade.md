@@ -10,6 +10,11 @@
 
 - Remove `openshift_schedulable` for each master from ansible inventory file
 
+- If you use disconnected environment with custom container registry, please check image prefix
+  ```
+  openshift_web_console_prefix=<registry_ip>:<port>/openshift3/ose-
+  template_service_broker_prefix=<registry_ip>:<port>/openshift3/ose-
+  ```
 
 - Update version related parameter in inventory file 
  
@@ -39,36 +44,35 @@ export API_SERVER=https://openshift.example.com:8443
 ```
 
 ## Update variables
-Do not change the default values from “./vars/defaults.yml” 
-If you want to override default variable, please use “./vars/override.yml” file. One thing you have to check is the latest version of image.
+If you want to override default variable, please use “./vars/default.yml” file. One thing you have to check is the latest version of image.
 ```
-$ vi vars/override.yml
+$ vi vars/default.yml
 
-# Metrics
-#openshift_metrics_image_version=<tag>
-#openshift_metrics_hawkular_hostname=<fqdn>
-#openshift_metrics_cassandra_storage_type=(emptydir|pv|dynamic)
-#metrics_image_version: v3.9.40
+## Upgrade - Metrics
+#openshift_metrics_image_version=<tag> 
+#openshift_metrics_hawkular_hostname=<fqdn> 
+#openshift_metrics_cassandra_storage_type=(emptydir|pv|dynamic) 
+###############################################################
+metrics_image_version: v3.9.43
 #metrics_hawkular_hostname:
-#metrics_cassandra_storage_type: emptydir
+#openshift_metrics_cassandra_storage_type: emptydir
 
-# EFK
+## Upgrade - EFK
 #openshift_logging_image_version == efk_image_version
-#efk_image_version: v3.9.40
+efk_image_version: v3.9.43 
 
-# Node Upgrade
-#openshift_upgrade_master_nodes_serial: "50%"
-#openshift_upgrade_infra_nodes_serial: "1"
-#openshift_upgrade_app_nodes_serial: "20%"
-#openshift_upgrade_infra_nodes_label: "region=infra"
-#openshift_upgrade_app_nodes_label: "region=app"
+## Upgrade - Node
+openshift_upgrade_master_nodes_serial: "50%" 
+openshift_upgrade_infra_nodes_serial: "1" 
+openshift_upgrade_app_nodes_serial: "20%" 
+openshift_upgrade_infra_nodes_label: "region=infra"
+openshift_upgrade_app_nodes_label: "region=app"
 
 ## Node Upgrade Common variables
-#openshift_upgrade_nodes_max_fail_percentager: 20
-#openshift_upgrade_nodes_drain_timeout: 600
+openshift_upgrade_nodes_max_fail_percentager: 20 
+openshift_upgrade_nodes_drain_timeout: 600
 
 ```
-
 
 ## Upgrade Phase 
 
@@ -148,66 +152,5 @@ $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag a
 
 ```
 
+### [Upgrade Components](./upgrade-components.md)
 
-### Upgrade the EFK Logging stack
-
-*Check List:*
-- Fluentd DC/DS has following config, then change “IfNotPresent” to “Always”
-```
-image: <image_name>:<vX.Y>
-imagePullPolicy: IfNotPresent
-```
-
-#### Existing container image version check
-```
-$ oc get po -n logging -o 'go-template={{range $pod := .items}}{{if eq $pod.status.phase "Running"}}{{range $container := $pod.spec.containers}}oc exec -c {{$container.name}} {{$pod.metadata.name}} -n logging -- find /root/buildinfo -name Dockerfile-openshift* | grep -o logging.* {{"\n"}}{{end}}{{end}}{{end}}' | bash -
-
-logging-curator-v3.7.61-2
-logging-elasticsearch-v3.7.61-2
-...
-logging-fluentd-v3.7.61-2
-logging-kibana-v3.7.61-2
-logging-auth-proxy-v3.7.61-2
-
-```
-
-*Commands*
-```
-$ cat vars/default.yml
-...
-efk_image_version: 3.7.61
-
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,efk --skip-tags metrics -e @vars/default.yml -e @vars/override.yml 
-```
-
-#### New container image version check
-```
-$ oc get po -n logging -o 'go-template={{range $pod := .items}}{{if eq $pod.status.phase "Running"}}{{range $container := $pod.spec.containers}}oc exec -c {{$container.name}} {{$pod.metadata.name}} -n logging -- find /root/buildinfo -name Dockerfile-openshift* | grep -o logging.* {{"\n"}}{{end}}{{end}}{{end}}' | bash -
-
-logging-curator-v3.9.40-2
-logging-elasticsearch-v3.9.40-2
-logging-fluentd-v3.9.40-2
-…..
-logging-kibana-v3.9.40-2
-logging-auth-proxy-v3.9.40-2
-
-```
-
-### Upgrade the Cluster Metrics
-
-*Commands*
-```
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,metrics --skip-tags efk -e @vars/default.yml -e @vars/override.yml 
-```
-
-#### New container image version check
-```
-$ oc get po -n openshift-infra -o 'go-template={{range $pod := .items}}{{if eq $pod.status.phase "Running"}}{{range $container := $pod.spec.containers}}oc exec {{$pod.metadata.name}} -- find /root/buildinfo -name Dockerfile-openshift* | grep -o metrics.* {{"\n"}}{{end}}{{end}}{{end}}' | bash -
-
-metrics-cassandra-v3.9.40-11
-metrics-hawkular-metrics-v3.9.40-11
-metrics-heapster-v3.9.40-11
-
-```
-
-#### [Verify latest version of OCP](./verify-ocp-health.md)
