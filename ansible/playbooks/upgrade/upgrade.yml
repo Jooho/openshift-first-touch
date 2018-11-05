@@ -106,7 +106,7 @@
           
 
 - name: Upgrade Metrics
-  include: "{{metrics_yaml}} openshift_metrics_install_metrics=true openshift_metrics_image_version={{metrics_image_version}} openshift_metrics_cassandra_storage_type={{metrics_cassandra_storage_type}}"
+  include: "{{metrics_yaml}} openshift_metrics_install_metrics=true openshift_metrics_image_version={{metrics_image_version}}"
   tags:
     - metrics
           

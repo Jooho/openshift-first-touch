@@ -1,0 +1,9 @@
+- hosts: masters[0]
+  tasks:
+#  - name: test
+#    find: patterns="atomic-openshift-*.service" path=/usr/lib/systemd/system
+#    register: node_backup_files
+# 
+#  - debug: var=node_backup_files
+  - name: test2
+    copy: src=/etc/origin  dest="/tmp/origin-{{ansible_date_time.date}}" directory_mode=yes remote_src=yes

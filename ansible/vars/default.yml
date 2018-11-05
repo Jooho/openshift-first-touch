@@ -1,8 +1,8 @@
-ocp_version: 3.9
+ocp_version: 3.10
 
 # Upgrade
-control_plane_upgrade_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/upgrades/v3_9/upgrade_control_plane.yml
-node_upgrade_yaml:  /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/upgrades/v3_9/upgrade_nodes.yml
+control_plane_upgrade_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/upgrades/v3_10/upgrade_control_plane.yml
+node_upgrade_yaml: /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/upgrades/v3_10/upgrade_nodes.yml 
 efk_yaml: /usr/share/ansible/openshift-ansible/playbooks/openshift-logging/config.yml
 metrics_yaml: /usr/share/ansible/openshift-ansible/playbooks/openshift-metrics/config.yml
 
@@ -11,13 +11,12 @@ metrics_yaml: /usr/share/ansible/openshift-ansible/playbooks/openshift-metrics/c
 #openshift_metrics_hawkular_hostname=<fqdn> 
 #openshift_metrics_cassandra_storage_type=(emptydir|pv|dynamic) 
 ###############################################################
-metrics_image_version: v3.9.43
+metrics_image_version: v3.10
 #metrics_hawkular_hostname:
-#metrics_cassandra_storage_type: emptydir
 
 ## Upgrade - EFK
 #openshift_logging_image_version == efk_image_version
-efk_image_version: v3.9.43 
+efk_image_version: v3.10
 
 ## Upgrade - Node
 openshift_upgrade_master_nodes_serial: "50%" 

@@ -2,6 +2,7 @@
 
 **[Setup Ansible Script Repository](./how-to-use.md)** - *Use 3.10 branch*
 
+
 ## Check List
 - Validate OpenShift Container Platform storage migration
   ```
@@ -25,7 +26,7 @@
           ...
   ```
 - BackUp
-  - Master
+  - Master (upgrade_prepare ansible will do it)
   ```
   /usr/lib/systemd/system/atomic-openshift-master-api.service
   /usr/lib/systemd/system/atomic-openshift-master-controllers.service
@@ -34,12 +35,12 @@
   /etc/origin/master/master-config.yaml
   /etc/origin/master/scheduler.json
   ```
-  - Node
+  - Node (upgrade_prepare ansible will do it)
   ```
   /usr/lib/systemd/system/atomic-openshift-*.service
   /etc/origin/node/node-config.yaml
   ```
-  - [ETCD](https://docs.openshift.com/container-platform/3.10/day_two_guide/environment_backup.html#etcd-backup_environment-backup)
+  - [ETCD](https://docs.openshift.com/container-platform/3.10/day_two_guide/environment_backup.html#etcd-backup_environment-backup) Config (upgrade_prepare ansible will do it)
   ```
   /etc/etcd/etcd.conf 
   
@@ -47,7 +48,7 @@
    mkdir -p /backup/etcd-config-$(date +%Y%m%d)/
    cp -R /etc/etcd/ /backup/etcd-config-$(date +%Y%m%d)/
   ```
-  - [ETCD DB](https://docs.openshift.com/container-platform/3.10/day_two_guide/environment_backup.html#etcd-backup_environment-backup)
+  - **MANUAL TASK** [ETCD DB](https://docs.openshift.com/container-platform/3.10/day_two_guide/environment_backup.html#etcd-backup_environment-backup)
 
   
 - By default, only openshift service will be restarted. If you want to restart system(node), specify below in inventory file
@@ -61,7 +62,11 @@
 
 
 ## Noticeable Change
+
 - Node ConfigMaps
+  node configurations are now [bootstrapped](https://docs.openshift.com/container-platform/3.10/architecture/infrastructure_components/kubernetes_infrastructure.html#node-bootstrapping) from the master. Do *NOT* change /etc/origin/node/node-config.yaml m
+anually. It will be overrided by ConfigMap.
+
   ```
   Changes should not be made to a node host’s /etc/origin/node/node-config.yaml file. They will be overwritten by the configuration defined in the ConfigMap used by the node.
   ```
@@ -72,38 +77,65 @@ export API_SERVER=https://openshift.example.com:8443
 ```
 
 ## Update variables
-Do not change the default values from “./vars/defaults.yml” 
-If you want to override default variable, please use “./vars/override.yml” file. One thing you have to check is the latest version of image.
+If you want to override default variable, please use “./vars/default.yml” file. One thing you have to check is the latest version of image.
 ```
-$ vi vars/override.yml
+$ vi vars/default.yml
 
-# Metrics
-#openshift_metrics_image_version=<tag>
-#openshift_metrics_hawkular_hostname=<fqdn>
-#openshift_metrics_cassandra_storage_type=(emptydir|pv|dynamic)
-#metrics_image_version: v3.10.10
+## Upgrade - Metrics
+#openshift_metrics_image_version=<tag> 
+#openshift_metrics_hawkular_hostname=<fqdn> 
+#openshift_metrics_cassandra_storage_type=(emptydir|pv|dynamic) 
+###############################################################
+metrics_image_version: v3.10
 #metrics_hawkular_hostname:
 #metrics_cassandra_storage_type: emptydir
 
-# EFK
+## Upgrade - EFK
 #openshift_logging_image_version == efk_image_version
-#efk_image_version: v3.10.10
+efk_image_version: v3.10
 
-# Node Upgrade
-#openshift_upgrade_master_nodes_serial: "50%"
-#openshift_upgrade_infra_nodes_serial: "1"
-#openshift_upgrade_app_nodes_serial: "20%"
-#openshift_upgrade_infra_nodes_label: "region=infra"
-#openshift_upgrade_app_nodes_label: "region=app"
+## Upgrade - Node
+openshift_upgrade_master_nodes_serial: "50%" 
+openshift_upgrade_infra_nodes_serial: "1" 
+openshift_upgrade_app_nodes_serial: "20%" 
+openshift_upgrade_infra_nodes_label: "region=infra"
+openshift_upgrade_app_nodes_label: "region=app"
 
 ## Node Upgrade Common variables
-#openshift_upgrade_nodes_max_fail_percentager: 20
-#openshift_upgrade_nodes_drain_timeout: 600
+openshift_upgrade_nodes_max_fail_percentager: 20 
+openshift_upgrade_nodes_drain_timeout: 600
 
+```
+
+## Practical Updates for Ansible hosts file
+- Change node label to node group
+```
+openshift_node_groups=[{'name': 'node-config-master', 'labels': ['node-role.kubernetes.io/master=true', 'role=master','region=mgmt']}, {'name': 'node-config-infra', 'labels': ['node-role.kubernetes.io/infra=true','role=infra','region=infra','zone=default']}, {'name': 'node-config-compute', 'labels': ['node-role.kubernetes.io/compute=true', 'role=app','region=app', 'zone=default'], 'edits': [{ 'key': 'kubeletArguments.pods-per-core','value': ['20']}]}]
+
+master.example.com openshift_node_group_name='node-config-master'
+infra-node.example.com openshift_node_group_name='node-config-infra'
+app-node.example.com openshift_node_group_name='node-config-compute'
+
+```
+
+- Change audit log path under /var/lib/origin
+```
+mkdir -p /var/lib/origin/log/openpaas-oscp-audit
+
+vi /etc/ansible/hosts
+...
+openshift_master_audit_config={"enabled": true, "auditFilePath": "/var/lib/origin/log/openpaas-oscp-audit/openpaas-oscp-audit.log", "maximumFileRetentionDays": 14, "maximumFileSizeMegabytes": 500, "maximumRetainedFiles": 5}
+```
+
+- Metrics Storage Type
+```
+openshift_metrics_storage_kind=dynamic ==> openshift_metrics_cassandra_storage_type=dynamic
 ```
 
 
 ## Upgrade Phase 
+
+* ETCD BACKUP is Manual JOB!!!! - DO IT Before upgrading*
 
 *Pre-requisites: Ansible Playbook: prepare_for_upgrade.yml*
 - Refresh subscription (for all nodes)
@@ -120,11 +152,34 @@ $ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/prepare_for_upgrade
 ansible-playbook -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
 ```
 
+## Create ConfigMap for Node Configuration.
+```
+ansible-playbook -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/playbooks/openshift-master/openshift_node_group.yml
+```
+## Verify the ConfigMap is the same as node-config.yaml
+```
+oc get configmaps -n openshift-node
+```
+
+## Updating Policy Definitions (If you have custom policy)
+*You must manually update the roles that contain this setting to include any new or required permissions after upgrading.*
+
+```
+oc annotate clusterrole.rbac <role_name> --overwrite rbac.authorization.kubernetes.io/autoupdate=false
+
+oc adm create-bootstrap-policy-file --filename=policy.json
+
+# Update podlicy.json file
+oc auth reconcile -f policy.json
+
+oc adm policy reconcile-sccs --additive-only=true --confirm
+```
+
 ### Upgrade to the latest version of OCP 3.10 Control Plane
 *Commands*
 ```
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,control_plane --skip-tags efk,metrics -e @vars/default.yml -e @vars/override.yml -vvvv
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,control_plane --skip-tags efk,metrics -e @vars/default.yml -vvvv
 ```
 
 #### Check Control Plane
@@ -165,7 +220,7 @@ openshift_upgrade_infra_nodes_serial: "1"
 openshift_upgrade_infra_nodes_label: "region=infra"
 
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,infra --skip-tags efk,metrics -e @vars/default.yml -e @vars/override.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,infra --skip-tags efk,metrics -e @vars/default.yml -vvvv
 ```
 
 ### Upgrade to the latest version of OCP 3.10 App Nodes
@@ -177,7 +232,7 @@ openshift_upgrade_app_nodes_serial: "20%"
 openshift_upgrade_app_nodes_label: "region=app"
 
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,app --skip-tags efk,metrics -e @vars/default.yml -e @vars/override.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,app --skip-tags efk,metrics -e @vars/default.yml -vvvv 
 
 ```
 
@@ -210,7 +265,7 @@ $ cat vars/default.yml
 ...
 efk_image_version: 3.9.10
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,efk --skip-tags metrics -e @vars/default.yml -e @vars/override.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,efk --skip-tags metrics -e @vars/default.yml -vvvv
 ```
 
 #### New container image version check
@@ -230,7 +285,7 @@ logging-auth-proxy-v3.9.40-2
 
 *Commands*
 ```
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,metrics --skip-tags efk -e @vars/default.yml -e @vars/override.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,metrics --skip-tags efk -e @vars/default.yml -vvvv
 ```
 
 #### New container image version check

@@ -54,12 +54,17 @@
                status: "In Progress"
                start: "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
     
+       - name: Backup Data
+         import_role:
+           name: backup
+
        - name: Prepare for nodes
          import_role:
            name: upgrade_prepare
          vars:
            node_type: "{{d_node_type}}"
 
+ 
        - name: Set Upgrade Prepare Nodes 'Complete'
          run_once: true
          set_stats:

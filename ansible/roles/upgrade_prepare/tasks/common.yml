@@ -25,6 +25,17 @@
 #    enable_repos: "--enable=rhel-7-server-ose-3.9-rpms --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-ansible-2.4-rpms --enable=rhel-7-fast-datapath-rpms"
 #  when: "ocp_version == 3.9"
 
+- name: Remove ansible-openshift-utils that is deprecated
+  yum:
+    name: ansible-openshift-utils
+    state: absent
+  delegate_to: localhost
+  run_once: yes
+  become: true
+  become_user: root
+
+
+
 - name: Enable/Disable repositories 
   shell: "{{ item }}"
   with_items:
@@ -39,7 +50,7 @@
     name: "{{ item }}"
     state: latest
   with_items:
-  - atomic-openshift-utils
+  - openshift-ansible
   - atomic-openshift-clients
   delegate_to: localhost
   run_once: yes

@@ -1,0 +1,50 @@
+
+- name: Create Backup Folder on Masters
+  file: path=/etc/origin_backup/master state=directory
+  when: inventory_hostname in groups['masters']
+  
+- name: Backup Master
+  copy: src="{{ item }}" dest="/etc/origin_backup/master" remote_src=yes
+  with_items:
+  - /usr/lib/systemd/system/atomic-openshift-master-api.service
+  - /usr/lib/systemd/system/atomic-openshift-master-controllers.service
+  - /etc/sysconfig/atomic-openshift-master-api
+  - /etc/sysconfig/atomic-openshift-master-controllers
+  - /etc/origin/master/master-config.yaml
+  - /etc/origin/master/scheduler.json
+  when: inventory_hostname in groups['masters']
+
+- name: Create Backup Folder on Nodes
+  file: path=/etc/origin_backup/node state=directory
+  when: inventory_hostname in groups['nodes']
+
+- name: Gather backup files from nodes
+  find: patterns="atomic-openshift-*.service" path=/usr/lib/systemd/system
+  register: node_backup_files
+  when: inventory_hostname in groups['nodes']
+
+- name: Backup Node - 1 
+  copy: src="{{ item.path }}" dest="/etc/origin_backup/node" remote_src=yes
+  with_items:
+  - "{{node_backup_files.files}}"
+  when: inventory_hostname in groups['nodes']
+  
+- name: Backup Node - 2
+  copy: src="/etc/origin/node/node-config.yaml" dest="/etc/origin_backup/node" remote_src=yes
+  when: inventory_hostname in groups['nodes']
+
+- name: Create Backup Folder on ETCD
+  file: path=/etc/origin_backup/etcd state=directory
+  when: "'etcd' in groups and inventory_hostname in groups['etcd']"
+
+- name: Gather backup files from ETCD
+  find: path="/etc/etcd" 
+  register: etcd_backup_files
+  when: inventory_hostname in groups['etcd']
+
+- name: Backup ETCD  
+  copy: src="{{ item.path }}" dest="/etc/origin_backup/etcd" remote_src=yes
+  with_items:
+  - "{{etcd_backup_files.files}}"
+  when: inventory_hostname in groups['etcd']
+
