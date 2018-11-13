@@ -26,7 +26,7 @@ $ cat vars/default.yml
 ...
 efk_image_version: 3.7.61
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,efk --skip-tags metrics -e @vars/default.yml -e @vars/override.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,efk --skip-tags metrics -e @vars/default.yml
 ```
 
 #### New container image version check
@@ -46,7 +46,7 @@ logging-auth-proxy-v3.9.40-2
 
 *Commands*
 ```
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,metrics --skip-tags efk -e @vars/default.yml -e @vars/override.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,metrics --skip-tags efk -e @vars/default.yml 
 ```
 
 #### New container image version check
