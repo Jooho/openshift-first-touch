@@ -1,6 +1,6 @@
 # Prepare Phase
 
-**[Setup Ansible Script Repository](./how-to-use.md)** - *Use 3.9 branch*
+**[Setup Ansible Script Repository](../how-to-use.md)** - *Use 3.9 branch*
 
 ## Check List
 - Validate OpenShift Container Platform storage migration
