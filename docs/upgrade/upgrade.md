@@ -95,7 +95,7 @@ ansible-playbook -i /etc/ansible/hosts /usr/share/ansible/openshift-ansible/play
 *Commands*
 ```
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,control_plane --skip-tags efk,metrics -e @vars/default.yml -e @vars/override.yml -vvvv
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,control_plane --skip-tags efk,metrics -e @vars/default.yml -vvvv
 ```
 
 #### Check Control Plane
@@ -136,7 +136,7 @@ openshift_upgrade_infra_nodes_serial: "1"
 openshift_upgrade_infra_nodes_label: "region=infra"
 
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,infra --skip-tags efk,metrics -e @vars/default.yml -e @vars/override.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,infra --skip-tags efk,metrics -e @vars/default.yml 
 ```
 
 ### Upgrade to the latest version of OCP 3.9 App Nodes
@@ -148,7 +148,7 @@ openshift_upgrade_app_nodes_serial: "20%"
 openshift_upgrade_app_nodes_label: "region=app"
 
 
-$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,app --skip-tags efk,metrics -e @vars/default.yml -e @vars/override.yml 
+$ ansible-playbook -i /etc/ansible/hosts ./playbooks/upgrade/upgrade.yml --tag always,app --skip-tags efk,metrics -e @vars/default.yml
 
 ```
 
