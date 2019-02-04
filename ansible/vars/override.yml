@@ -4,13 +4,13 @@
 #openshift_metrics_hawkular_hostname=<fqdn>
 #openshift_metrics_cassandra_storage_type=(emptydir|pv|dynamic)
 ###############################################################
-metrics_image_version: v3.9.40
+#metrics_image_version: v3.9.40
 #metrics_hawkular_hostname:
 #metrics_cassandra_storage_type: emptydir
 
 ## Upgrade - EFK
 #openshift_logging_image_version == efk_image_version
-efk_image_version: v3.9.40
+#efk_image_version: v3.9.40
 
 ## Upgrade - Node
 #openshift_upgrade_master_nodes_serial: "50%"

@@ -20,8 +20,9 @@ efk_image_version: v3.10
 
 ## Upgrade - Node
 openshift_upgrade_master_nodes_serial: "50%" 
-openshift_upgrade_infra_nodes_serial: "1" 
-openshift_upgrade_app_nodes_serial: "20%" 
+openshift_upgrade_infra_nodes_serial: "3" 
+#openshift_upgrade_app_nodes_serial: "20%" 
+openshift_upgrade_app_nodes_serial: "2" 
 openshift_upgrade_infra_nodes_label: "region=infra"
 openshift_upgrade_app_nodes_label: "region=app"
 

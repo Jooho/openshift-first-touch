@@ -133,7 +133,8 @@
   - app
   tasks:
   - name: Get infra nodes list
-    shell: "oc get node -l {{openshift_upgrade_infra_nodes_label}}  --no-headers -o name"
+    shell: >
+        oc get node -l {{openshift_upgrade_infra_nodes_label}}  --no-headers -o jsonpath='{ range .items[*].metadata}{.name }{"\n"}{end}'
     register: infra_nodes_list
  
   - name: Add infra nodes list to memory
@@ -143,7 +144,8 @@
     with_items: "{{infra_nodes_list.stdout_lines}}"
 
   - name: Get app nodes list
-    shell: "oc get node -l {{openshift_upgrade_app_nodes_label}}  --no-headers -o name"
+    shell: >
+      oc get node -l {{openshift_upgrade_app_nodes_label}}  --no-headers -o jsonpath='{ range .items[*].metadata}{.name }{"\n"}{end}'
     register: app_nodes_list
 
   - name: Add app nodes list to memory
