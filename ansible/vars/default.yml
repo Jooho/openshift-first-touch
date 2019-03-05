@@ -27,5 +27,5 @@ openshift_upgrade_infra_nodes_label: "region=infra"
 openshift_upgrade_app_nodes_label: "region=app"
 
 ## Node Upgrade Common variables
-openshift_upgrade_nodes_max_fail_percentager: 20 
+openshift_upgrade_nodes_max_fail_percentage: 20 
 openshift_upgrade_nodes_drain_timeout: 600
