@@ -36,7 +36,7 @@ oc process -f deployment.yaml -p NFS_SERVER=$NFS_SERVER_HOST_IP -p NFS_PATH=$NFS
 
 
 (ex)
-oc process -f deployment.yaml -p NFS_SERVER=nfs.exmale.com -p NFS_PATH=/exports-nfs -p NAMESPACE=nfs-client-provisioner |oc create -f -
+oc process -f deployment.yaml -p NFS_SERVER=nfs.example.com -p NFS_PATH=/exports-nfs -p NAMESPACE=nfs-client-provisioner |oc create -f -
 
 oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:nfs-client-provisioner:nfs-client-provisioner
 
